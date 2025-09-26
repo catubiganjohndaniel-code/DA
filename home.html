@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para sa Iyo</title>
+    <!-- Google Fonts for 'Dancing Script' and 'Poppins' -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons (heart, music, note, flower) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #fce4ec; /* Light pink background */
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+
+        /* --- Secret Code Page Styles --- */
+        #secretCodePage {
+            background-color: white;
+            padding: 40px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
+            box-sizing: border-box;
+            position: absolute; /* Para hindi mag-overlap sa main content */
+            z-index: 3; /* Highest z-index for initial screen */
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        #secretCodePage.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none; /* Disable interactions when hidden */
+        }
+
+        #secretCodePage h1 {
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            font-size: 2.2em;
+            margin-bottom: 25px;
+        }
+
+        #secretCodePage input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ffcdd2;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-align: center;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #secretCodePage input[type="password"]:focus {
+            border-color: #d81b60;
+        }
+
+        #secretCodePage button {
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #secretCodePage button:hover {
+            background-color: #d81b60;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* --- Welcome Header Styles (appears briefly) --- */
+        #welcomeScreen {
+            position: fixed; /* Fixed at the top */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh; /* Full screen */
+            background-color: #fce4ec; /* Background color of the main page */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2; /* Above main content, below secretCodePage */
+            opacity: 0; /* Hidden initially */
+            pointer-events: none; /* No interaction when hidden */
+            transition: opacity 1s ease-out;
+        }
+
+        #welcomeScreen.visible {
+            opacity: 1;
+            pointer-events: all; /* Allow interaction when visible */
+        }
+
+        #welcomeScreen h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            font-size: 4em; /* Larger font for welcome */
+            margin: 0;
+            text-align: center;
+        }
+
+        /* --- Main Content Wrapper Styles --- */
+        #mainContentWrapper {
+            display: none; /* Hidden by default */
+            width: 100%;
+            max-width: 800px; /* Adjust as needed */
+            min-height: 100vh; /* Full viewport height */
+            background-color: #fce4ec; /* Light pink background */
+            position: relative;
+            box-sizing: border-box;
+            padding-top: 20px; /* Some padding at the top */
+            opacity: 0; /* Hidden initially */
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        #mainContentWrapper.visible {
+            display: flex; /* Use flex to center content */
+            flex-direction: column;
+            align-items: center;
+            opacity: 1;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: center;
+            background-color: #f8bbd0; /* Slightly darker pink for navbar */
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            position: sticky; /* Sticky navbar */
+            top: 0;
+            width: 100%;
+            z-index: 1;
+            border-bottom-left-radius: 15px; /* Rounded corners for navbar */
+            border-bottom-right-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .navbar a {
+            font-family: 'Poppins', sans-serif;
+            color: #d81b60;
+            text-decoration: none;
+            padding: 10px 20px;
+            margin: 0 5px;
+            border-radius: 20px;
+            transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px; /* Space between icon and text */
+            font-weight: 600;
+        }
+
+        .navbar a:hover,
+        .navbar a.active {
+            background-color: #e91e63; /* Bright pink for active/hover */
+            color: white;
+            transform: translateY(-2px); /* Slight lift effect */
+        }
+
+        .content-area {
+            flex-grow: 1; /* Allows content to take up remaining space */
+            width: 90%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            box-sizing: border-box;
+            margin-bottom: 20px; /* Space at the bottom */
+        }
+
+        .content-section {
+            display: none; /* Hide all content sections by default */
+            animation: fadeIn 0.5s ease-out; /* Fade-in animation */
+        }
+
+        .content-section.active {
+            display: block; /* Show active content section */
+        }
+
+        .content-section h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #d81b60;
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .content-section p {
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        /* Toggleable Textarea Styles */
+        .letter-container {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .letter-container textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ffcdd2;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1em;
+            min-height: 250px;
+            resize: vertical;
+            outline: none;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .letter-container:hover textarea {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Music and Reminders List Styles */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #ffebee; /* Lighter pink for list items */
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #d81b60;
+            font-weight: 500;
+        }
+
+        ul li i {
+            color: #e91e63; /* Icon color */
+        }
+
+        /* Photos Grid */
+        .photos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            justify-items: center;
+        }
+
+        .photos-grid img {
+            width: 100%;
+            height: 150px; /* Fixed height for consistency */
+            object-fit: cover; /* Cover the area, crop if necessary */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease;
+        }
+
+        .photos-grid img:hover {
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 1. Secret Code Page (Initial Screen) -->
+    <div id="secretCodePage">
+        <h1>Enter the secret code</h1>
+        <input type="password" id="secretCodeInput" placeholder="••••••••">
+        <button id="enterButton">Enter</button>
+    </div>
+
+    <!-- 2. Welcome Screen (Appears after correct code, then fades out) -->
+    <div id="welcomeScreen">
+        <h2>Welcome my love, enjoy your stay</h2>
+    </div>
+
+    <!-- 3. Main Content Wrapper (Appears after welcome screen fades) -->
+    <div id="mainContentWrapper">
+        <!-- Navigation Bar -->
+        <div class="navbar">
+            <a href="#" class="nav-link active" data-target="loveLetterContent"><i class="fa-solid fa-heart"></i> Love Letter</a>
+            <a href="#" class="nav-link" data-target="musicContent"><i class="fa-solid fa-music"></i> Music</a>
+            <a href="#" class="nav-link" data-target="remindersContent"><i class="fa-solid fa-note-sticky"></i> Reminders</a>
+            <a href="#" class="nav-link" data-target="photosContent"><i class="fa-solid fa-flower"></i> Photos</a>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <!-- Love Letter Section -->
+            <div id="loveLetterContent" class="content-section active">
+                <h2>My Dearest,</h2>
+                <p>A letter for you my best person</p>
+                <div class="letter-container">
+                    <textarea rows="15" readonly> Every step with you feels like a beautiful dream that I never want to wake up from. Your laughter is the melody that plays in my heart, and your smile brightens even my darkest days. You've shown me what true happiness means, and I'm eternally grateful for your presence in my life.I promise to cherish you always, remember our moments and never forget my love to you.Love,                                                                                                                                                                                                                                                                              From; Your only one Daniel
+                    </textarea>
+                </div>
+            </div>
+
+            <!-- Music Section -->
+            <div id="musicContent" class="content-section">
+                <h2>Songs that remind me of you</h2>
+                <ul>
+                    <li><i class="fa-solid fa-play"></i> "Dandelions" - Ruth B.</li>
+                    <li><i class="fa-solid fa-play"></i> "Can't Help Falling In Love" - Elvis Presley</li>
+                    <li><i class="fa-solid fa-play"></i> "Perfect" - Ed Sheeran</li>
+                </ul>
+            </div>
+
+            <!-- Reminders Section -->
+            <div id="remindersContent" class="content-section">
+                <h2>Some Reminders For You</h2>
+                <ul>
+                    <li><i class="fa-solid fa-check-circle"></i> Always eat on time.</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Get enough rest, you deserve it.</li>
+                    <li><i class="fa-solid fa-check-circle"></i> You are beautiful, inside and out.</li>
+                    <li><i class="fa-solid fa-check-circle"></i> I'm always here for you.</li>
+                </ul>
+            </div>
+
+            <!-- Photos Section -->
+            <div id="photosContent" class="content-section">
+                <h2>Your Cutie Pics</h2>
+                <div class="photos-grid">
+                    <img src="images/image1.jpg" alt="Image 1">
+                    <img src="images/image2.jpg" alt="Image 2">
+                    <img src="images/image3.jpg" alt="Image 3">
+                    <img src="images/image4.jpg" alt="Image 4">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const secretCodePage = document.getElementById('secretCodePage');
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const mainContentWrapper = document.getElementById('mainContentWrapper');
+        const secretCodeInput = document.getElementById('secretCodeInput');
+        const enterButton = document.getElementById('enterButton');
+        const navLinks = document.querySelectorAll('.navbar a');
+        const contentSections = document.querySelectorAll('.content-section');
+        const letterContainer = document.querySelector('.letter-container');
+        const textarea = document.querySelector('.letter-container textarea');
+
+        // Set correct code
+        const correctCode = 'MyLove'; // Change this to your desired secret code
+
+        // Function to show main content
+        function showMainContent() {
+            secretCodePage.classList.add('hidden');
+            welcomeScreen.classList.add('visible');
+
+            // After 2 seconds, fade out the welcome screen and show main content
+            setTimeout(() => {
+                welcomeScreen.classList.remove('visible');
+                mainContentWrapper.classList.add('visible');
+            }, 2000);
+        }
+
+        // Event listener for enter button
+        enterButton.addEventListener('click', () => {
+            const enteredCode = secretCodeInput.value;
+            if (enteredCode === correctCode) {
+                showMainContent();
+            } else {
+                alert('Incorrect code. Please try again.');
+            }
+        });
+
+        // Event listeners for navigation links
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                // Remove active class from all links
+                navLinks.forEach(navLink => navLink.classList.remove('active'));
+
+                // Hide all content sections
+                contentSections.forEach(section => section.classList.remove('active'));
+
+                // Add active class to the clicked link
+                link.classList.add('active');
+
+                // Show the corresponding content section
+                const targetId = link.dataset.target;
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+
+        // Event listener for letter click
+        letterContainer.addEventListener('click', function () {
+            textarea.focus();
+        });
+    </script>
+</body>
+
+</html>
